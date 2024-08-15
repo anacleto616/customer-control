@@ -1,4 +1,5 @@
 using CustomerControl.Api.Data;
+using CustomerControl.Api.Endpoints;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +19,7 @@ builder.Services.AddDbContext<CustomerControlContext>(options =>
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.MapCustomersEndpoints();
 
 await app.MigrateDbAsync();
 
