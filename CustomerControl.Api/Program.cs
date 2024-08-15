@@ -19,7 +19,9 @@ builder.Services.AddDbContext<CustomerControlContext>(options =>
 
 var app = builder.Build();
 
+app.MapUsersEndpoints();
 app.MapCustomersEndpoints();
+app.MapInvoicesEndpoints();
 
 await app.MigrateDbAsync();
 
