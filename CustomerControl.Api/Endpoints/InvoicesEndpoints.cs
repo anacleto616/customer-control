@@ -48,6 +48,25 @@ public static class InvoicesEndpoints
             }
         );
 
+        // PUT /invoices/1
+        group.MapPut(
+            "/{id}",
+            async (int id, Invoice updatedInvoice, CustomerControlContext dbContext) =>
+            {
+                var existingInvoice = await dbContext.Invoices.FindAsync(id);
+
+                if (existingInvoice is null)
+                {
+                    return Results.NotFound();
+                }
+
+                dbContext.Entry(existingInvoice).CurrentValues.SetValues(updatedInvoice);
+                await dbContext.SaveChangesAsync();
+
+                return Results.NoContent();
+            }
+        );
+
         return group;
     }
 }
