@@ -1,4 +1,5 @@
 using CustomerControl.Api.Data;
+using CustomerControl.Api.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerControl.Api.Endpoints;
@@ -17,6 +18,19 @@ public static class InvoicesEndpoints
             async (CustomerControlContext dbContext) =>
                 await dbContext.Invoices.Select(invoices => invoices).AsNoTracking().ToListAsync()
         );
+
+        // GET /invoices/1
+        group
+            .MapGet(
+                "/{id}",
+                async (int id, CustomerControlContext dbContext) =>
+                {
+                    Invoice? invoice = await dbContext.Invoices.FindAsync(id);
+
+                    return invoice is null ? Results.NotFound() : Results.Ok(invoice);
+                }
+            )
+            .WithName(GetInvoiceEndpointName);
 
         return group;
     }
