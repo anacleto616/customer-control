@@ -67,6 +67,17 @@ public static class InvoicesEndpoints
             }
         );
 
+        // DELETE /invoice/1
+        group.MapDelete(
+            "/{id}",
+            async (int id, CustomerControlContext dbContext) =>
+            {
+                await dbContext.Invoices.Where(invoice => invoice.Id == id).ExecuteDeleteAsync();
+
+                return Results.NoContent();
+            }
+        );
+
         return group;
     }
 }
