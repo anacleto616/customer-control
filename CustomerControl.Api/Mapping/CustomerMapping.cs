@@ -13,10 +13,22 @@ public static class CustomerMapping
             customer.Invoices?.Count(invoice => invoice.DueDate < DateTime.Now) ?? 0;
 
         return new CustomerDetailsDto(
+            customer.Id,
             customer.Name,
             paidInvoicesCount,
             openInvoicesCount,
             overdueInvoicesCount
+        );
+    }
+
+    public static CustomerSummaryDto ToCustomerSummarysDto(this Customer customer)
+    {
+        return new CustomerSummaryDto(
+            customer.Id,
+            customer.Name,
+            customer.Document,
+            customer.Phone,
+            customer.Address
         );
     }
 }

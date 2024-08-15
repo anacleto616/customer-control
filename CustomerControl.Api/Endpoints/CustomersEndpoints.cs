@@ -31,7 +31,9 @@ namespace CustomerControl.Api.Endpoints
                     {
                         Customer? customer = await dbContext.Customers.FindAsync(id);
 
-                        return customer is null ? Results.NotFound() : Results.Ok(customer);
+                        return customer is null
+                            ? Results.NotFound()
+                            : Results.Ok(customer.ToCustomerSummarysDto());
                     }
                 )
                 .WithName(GetCustomerEndpointName);
