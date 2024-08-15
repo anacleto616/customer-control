@@ -32,6 +32,22 @@ public static class InvoicesEndpoints
             )
             .WithName(GetInvoiceEndpointName);
 
+        // POST /invoices
+        group.MapPost(
+            "/",
+            async (Invoice newInvoice, CustomerControlContext dbContext) =>
+            {
+                dbContext.Invoices.Add(newInvoice);
+                await dbContext.SaveChangesAsync();
+
+                return Results.CreatedAtRoute(
+                    GetInvoiceEndpointName,
+                    new { id = newInvoice.Id },
+                    newInvoice
+                );
+            }
+        );
+
         return group;
     }
 }
