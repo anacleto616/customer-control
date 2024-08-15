@@ -1,4 +1,5 @@
 using CustomerControl.Api.Data;
+using CustomerControl.Api.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerControl.Api.Endpoints
@@ -20,6 +21,19 @@ namespace CustomerControl.Api.Endpoints
                         .AsNoTracking()
                         .ToListAsync()
             );
+
+            // GET /customers/1
+            group
+                .MapGet(
+                    "/{id}",
+                    async (int id, CustomerControlContext dbContext) =>
+                    {
+                        Customer? customer = await dbContext.Customers.FindAsync(id);
+
+                        return customer is null ? Results.NotFound() : Results.Ok(customer);
+                    }
+                )
+                .WithName(GetCustomerEndpointName);
 
             // DELETE /customers/1
             group.MapDelete(
