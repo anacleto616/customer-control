@@ -21,6 +21,19 @@ namespace CustomerControl.Api.Endpoints
                         .ToListAsync()
             );
 
+            // DELETE /customers/1
+            group.MapDelete(
+                "/{id}",
+                async (int id, CustomerControlContext dbContext) =>
+                {
+                    await dbContext
+                        .Customers.Where(customer => customer.Id == id)
+                        .ExecuteDeleteAsync();
+
+                    return Results.NoContent();
+                }
+            );
+
             return group;
         }
     }
