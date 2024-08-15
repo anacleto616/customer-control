@@ -35,6 +35,22 @@ namespace CustomerControl.Api.Endpoints
                 )
                 .WithName(GetCustomerEndpointName);
 
+            // POST /customers
+            group.MapPost(
+                "/",
+                async (Customer newCustomer, CustomerControlContext dbContext) =>
+                {
+                    dbContext.Customers.Add(newCustomer);
+                    await dbContext.SaveChangesAsync();
+
+                    return Results.CreatedAtRoute(
+                        GetCustomerEndpointName,
+                        new { id = newCustomer.Id },
+                        newCustomer
+                    );
+                }
+            );
+
             // DELETE /customers/1
             group.MapDelete(
                 "/{id}",
