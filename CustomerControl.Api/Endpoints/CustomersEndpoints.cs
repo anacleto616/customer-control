@@ -51,6 +51,25 @@ namespace CustomerControl.Api.Endpoints
                 }
             );
 
+            // PUT /customers/1
+            group.MapPut(
+                "/{id}",
+                async (int id, Customer updatedCustomer, CustomerControlContext dbContext) =>
+                {
+                    var existingCustomer = await dbContext.Customers.FindAsync(id);
+
+                    if (existingCustomer is null)
+                    {
+                        return Results.NotFound();
+                    }
+
+                    dbContext.Entry(existingCustomer).CurrentValues.SetValues(updatedCustomer);
+                    await dbContext.SaveChangesAsync();
+
+                    return Results.NoContent();
+                }
+            );
+
             // DELETE /customers/1
             group.MapDelete(
                 "/{id}",
