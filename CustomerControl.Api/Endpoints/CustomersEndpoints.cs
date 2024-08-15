@@ -1,5 +1,6 @@
 using CustomerControl.Api.Data;
 using CustomerControl.Api.Entities;
+using CustomerControl.Api.Mapping;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerControl.Api.Endpoints
@@ -17,7 +18,7 @@ namespace CustomerControl.Api.Endpoints
                 "/",
                 async (CustomerControlContext dbContext) =>
                     await dbContext
-                        .Customers.Select(customer => customer)
+                        .Customers.Select(customer => customer.ToCustomerDetailsDto())
                         .AsNoTracking()
                         .ToListAsync()
             );

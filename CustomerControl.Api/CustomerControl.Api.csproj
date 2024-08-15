@@ -8,8 +8,10 @@
 
   <ItemGroup>
     <Folder Include="Data/" />
+    <Folder Include="Dtos/" />
     <Folder Include="Endpoints/" />
     <Folder Include="Entities/" />
+    <Folder Include="Mapping/" />
   </ItemGroup>
 
   <ItemGroup>
