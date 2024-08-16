@@ -1,5 +1,6 @@
 using CustomerControl.Api.Data;
 using CustomerControl.Api.Endpoints;
+using CustomerControl.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,8 @@ var connectionString =
 builder.Services.AddDbContext<CustomerControlContext>(options =>
     options.UseNpgsql(connectionString)
 );
+
+builder.Services.AddSingleton<Argon2PasswordHasher>();
 
 var app = builder.Build();
 

@@ -12,10 +12,12 @@
     <Folder Include="Endpoints/" />
     <Folder Include="Entities/" />
     <Folder Include="Mapping/" />
+    <Folder Include="Services/" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DotNetEnv" Version="3.1.0" />
+    <PackageReference Include="Konscious.Security.Cryptography.Argon2" Version="1.3.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
