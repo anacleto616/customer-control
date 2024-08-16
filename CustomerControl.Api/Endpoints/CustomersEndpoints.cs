@@ -34,7 +34,7 @@ namespace CustomerControl.Api.Endpoints
 
                         return customer is null
                             ? Results.NotFound()
-                            : Results.Ok(customer.ToCustomerSummarysDto());
+                            : Results.Ok(customer.ToCustomerSummaryDto());
                     }
                 )
                 .WithName(GetCustomerEndpointName);
@@ -60,7 +60,7 @@ namespace CustomerControl.Api.Endpoints
                     return Results.CreatedAtRoute(
                         GetCustomerEndpointName,
                         new { id = customer.Id },
-                        customer.ToCustomerSummarysDto()
+                        customer.ToCustomerSummaryDto()
                     );
                 }
             );
@@ -68,7 +68,12 @@ namespace CustomerControl.Api.Endpoints
             // PUT /customers/1
             group.MapPut(
                 "/{id}",
-                async (int id, Customer updatedCustomer, CustomerControlContext dbContext) =>
+                async (
+                    int id,
+                    int userId,
+                    UpdateCustomerDto updatedCustomer,
+                    CustomerControlContext dbContext
+                ) =>
                 {
                     var existingCustomer = await dbContext.Customers.FindAsync(id);
 
@@ -77,7 +82,14 @@ namespace CustomerControl.Api.Endpoints
                         return Results.NotFound();
                     }
 
-                    dbContext.Entry(existingCustomer).CurrentValues.SetValues(updatedCustomer);
+                    var user =
+                        await dbContext.Users.FindAsync(userId)
+                        ?? throw new ArgumentException("User not found.");
+
+                    dbContext
+                        .Entry(existingCustomer)
+                        .CurrentValues.SetValues(updatedCustomer.ToEntity(id, user));
+
                     await dbContext.SaveChangesAsync();
 
                     return Results.NoContent();

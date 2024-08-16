@@ -18,6 +18,20 @@ public static class CustomerMapping
         };
     }
 
+    public static Customer ToEntity(this UpdateCustomerDto customer, int id, User user)
+    {
+        return new Customer()
+        {
+            Id = id,
+            Name = customer.Name,
+            Document = customer.Document,
+            Phone = customer.Phone,
+            Address = customer.Address,
+            UserId = user.Id,
+            User = user
+        };
+    }
+
     public static CustomerDetailsDto ToCustomerDetailsDto(this Customer customer)
     {
         var paidInvoicesCount = customer.Invoices?.Count(invoice => invoice.Paid) ?? 0;
@@ -34,7 +48,7 @@ public static class CustomerMapping
         );
     }
 
-    public static CustomerSummaryDto ToCustomerSummarysDto(this Customer customer)
+    public static CustomerSummaryDto ToCustomerSummaryDto(this Customer customer)
     {
         return new CustomerSummaryDto(
             customer.Id,
