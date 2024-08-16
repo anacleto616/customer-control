@@ -5,6 +5,19 @@ namespace CustomerControl.Api.Mapping;
 
 public static class CustomerMapping
 {
+    public static Customer ToEntity(this CreateCustomerDto customer, User user)
+    {
+        return new Customer()
+        {
+            Name = customer.Name,
+            Document = customer.Document,
+            Phone = customer.Phone,
+            Address = customer.Address,
+            UserId = user.Id,
+            User = user
+        };
+    }
+
     public static CustomerDetailsDto ToCustomerDetailsDto(this Customer customer)
     {
         var paidInvoicesCount = customer.Invoices?.Count(invoice => invoice.Paid) ?? 0;

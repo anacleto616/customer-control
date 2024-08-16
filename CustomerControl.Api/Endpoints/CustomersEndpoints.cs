@@ -1,4 +1,5 @@
 using CustomerControl.Api.Data;
+using CustomerControl.Api.Dtos;
 using CustomerControl.Api.Entities;
 using CustomerControl.Api.Mapping;
 using Microsoft.EntityFrameworkCore;
@@ -41,15 +42,25 @@ namespace CustomerControl.Api.Endpoints
             // POST /customers
             group.MapPost(
                 "/",
-                async (Customer newCustomer, CustomerControlContext dbContext) =>
+                async (
+                    CreateCustomerDto newCustomer,
+                    int userId,
+                    CustomerControlContext dbContext
+                ) =>
                 {
-                    dbContext.Customers.Add(newCustomer);
+                    var user =
+                        await dbContext.Users.FindAsync(userId)
+                        ?? throw new ArgumentException("User not found.");
+
+                    Customer customer = newCustomer.ToEntity(user);
+
+                    dbContext.Customers.Add(customer);
                     await dbContext.SaveChangesAsync();
 
                     return Results.CreatedAtRoute(
                         GetCustomerEndpointName,
-                        new { id = newCustomer.Id },
-                        newCustomer
+                        new { id = customer.Id },
+                        customer.ToCustomerSummarysDto()
                     );
                 }
             );
