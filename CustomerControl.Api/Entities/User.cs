@@ -7,5 +7,5 @@ public class User
     public required string Email { get; set; }
     public required string Password { get; set; }
 
-    public ICollection<Customer>? Customers { get; set; }
+    public IEnumerable<Customer>? Customers { get; set; }
 }

@@ -19,6 +19,7 @@ public class Argon2PasswordHasher
             Salt = salt,
             Iterations = _iterations,
             MemorySize = _memorySize,
+            DegreeOfParallelism = 5
         };
 
         var hash = hasher.GetBytes(_hashSize);

@@ -5,7 +5,7 @@ namespace CustomerControl.Api.Mapping;
 
 public static class CustomerMapping
 {
-    public static Customer ToEntity(this CreateCustomerDto customer, User user)
+    public static Customer ToEntity(this CreateCustomerDto customer)
     {
         return new Customer()
         {
@@ -13,12 +13,11 @@ public static class CustomerMapping
             Document = customer.Document,
             Phone = customer.Phone,
             Address = customer.Address,
-            UserId = user.Id,
-            User = user
+            UserId = customer.UserId,
         };
     }
 
-    public static Customer ToEntity(this UpdateCustomerDto customer, int id, User user)
+    public static Customer ToEntity(this UpdateCustomerDto customer, int id)
     {
         return new Customer()
         {
@@ -27,8 +26,7 @@ public static class CustomerMapping
             Document = customer.Document,
             Phone = customer.Phone,
             Address = customer.Address,
-            UserId = user.Id,
-            User = user
+            UserId = customer.UserId,
         };
     }
 

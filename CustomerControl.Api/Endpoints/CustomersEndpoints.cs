@@ -52,7 +52,7 @@ namespace CustomerControl.Api.Endpoints
                         await dbContext.Users.FindAsync(userId)
                         ?? throw new ArgumentException("User not found.");
 
-                    Customer customer = newCustomer.ToEntity(user);
+                    Customer customer = newCustomer.ToEntity();
 
                     dbContext.Customers.Add(customer);
                     await dbContext.SaveChangesAsync();
@@ -88,7 +88,7 @@ namespace CustomerControl.Api.Endpoints
 
                     dbContext
                         .Entry(existingCustomer)
-                        .CurrentValues.SetValues(updatedCustomer.ToEntity(id, user));
+                        .CurrentValues.SetValues(updatedCustomer.ToEntity(id));
 
                     await dbContext.SaveChangesAsync();
 

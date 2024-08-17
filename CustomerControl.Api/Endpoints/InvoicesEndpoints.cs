@@ -48,7 +48,7 @@ public static class InvoicesEndpoints
                     await dbContext.Customers.FindAsync(customerId)
                     ?? throw new ArgumentException("Customer not found.");
 
-                Invoice invoice = newInvoice.ToEntity(customer);
+                Invoice invoice = newInvoice.ToEntity();
 
                 dbContext.Invoices.Add(invoice);
                 await dbContext.SaveChangesAsync();
@@ -84,7 +84,7 @@ public static class InvoicesEndpoints
 
                 dbContext
                     .Entry(existingInvoice)
-                    .CurrentValues.SetValues(updatedInvoice.ToEntity(id, customer));
+                    .CurrentValues.SetValues(updatedInvoice.ToEntity(id));
                 await dbContext.SaveChangesAsync();
 
                 return Results.NoContent();

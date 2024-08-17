@@ -10,6 +10,6 @@ public class Customer
 
     public int UserId { get; set; }
 
-    public required User User { get; set; }
-    public ICollection<Invoice>? Invoices { get; set; }
+    public User? User { get; set; }
+    public IEnumerable<Invoice>? Invoices { get; set; }
 }

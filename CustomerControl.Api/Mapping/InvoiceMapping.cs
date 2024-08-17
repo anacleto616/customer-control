@@ -6,7 +6,7 @@ namespace CustomerControl.Api.Mapping;
 
 public static class InvoiceMapping
 {
-    public static Invoice ToEntity(this CreateInvoiceDto invoice, Customer customer)
+    public static Invoice ToEntity(this CreateInvoiceDto invoice)
     {
         return new Invoice()
         {
@@ -14,12 +14,11 @@ public static class InvoiceMapping
             Amount = invoice.Amount,
             DueDate = invoice.DueDate,
             Paid = invoice.Paid,
-            CustomerId = customer.Id,
-            Customer = customer
+            CustomerId = invoice.CustomerId,
         };
     }
 
-    public static Invoice ToEntity(this UpdateInvoiceDto invoice, int id, Customer customer)
+    public static Invoice ToEntity(this UpdateInvoiceDto invoice, int id)
     {
         return new Invoice()
         {
@@ -28,8 +27,7 @@ public static class InvoiceMapping
             Amount = invoice.Amount,
             DueDate = invoice.DueDate,
             Paid = invoice.Paid,
-            CustomerId = customer.Id,
-            Customer = customer
+            CustomerId = invoice.CustomerId,
         };
     }
 

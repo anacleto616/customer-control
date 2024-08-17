@@ -10,5 +10,5 @@ public class Invoice
 
     public int CustomerId { get; set; }
 
-    public required Customer Customer { get; set; }
+    public Customer? Customer { get; set; }
 }
