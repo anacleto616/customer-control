@@ -1,4 +1,5 @@
 using CustomerControl.Api.Data;
+using CustomerControl.Api.Dtos;
 using CustomerControl.Api.Entities;
 using CustomerControl.Api.Mapping;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ public static class InvoicesEndpoints
             "/",
             async (CustomerControlContext dbContext) =>
                 await dbContext
-                    .Invoices.Select(invoice => invoice.ToInvoiceSummaryDto())
+                    .Invoices.Select(invoice => invoice.ToInvoiceDetailsDto())
                     .AsNoTracking()
                     .ToListAsync()
         );
@@ -31,7 +32,9 @@ public static class InvoicesEndpoints
                 {
                     Invoice? invoice = await dbContext.Invoices.FindAsync(id);
 
-                    return invoice is null ? Results.NotFound() : Results.Ok(invoice);
+                    return invoice is null
+                        ? Results.NotFound()
+                        : Results.Ok(invoice.ToInvoiceSummaryDto());
                 }
             )
             .WithName(GetInvoiceEndpointName);
@@ -39,15 +42,21 @@ public static class InvoicesEndpoints
         // POST /invoices
         group.MapPost(
             "/",
-            async (Invoice newInvoice, CustomerControlContext dbContext) =>
+            async (CreateInvoiceDto newInvoice, int customerId, CustomerControlContext dbContext) =>
             {
-                dbContext.Invoices.Add(newInvoice);
+                var customer =
+                    await dbContext.Customers.FindAsync(customerId)
+                    ?? throw new ArgumentException("Customer not found.");
+
+                Invoice invoice = newInvoice.ToEntity(customer);
+
+                dbContext.Invoices.Add(invoice);
                 await dbContext.SaveChangesAsync();
 
                 return Results.CreatedAtRoute(
                     GetInvoiceEndpointName,
-                    new { id = newInvoice.Id },
-                    newInvoice
+                    new { id = invoice.Id },
+                    invoice.ToInvoiceSummaryDto()
                 );
             }
         );
@@ -55,7 +64,12 @@ public static class InvoicesEndpoints
         // PUT /invoices/1
         group.MapPut(
             "/{id}",
-            async (int id, Invoice updatedInvoice, CustomerControlContext dbContext) =>
+            async (
+                int id,
+                int customerId,
+                UpdateInvoiceDto updatedInvoice,
+                CustomerControlContext dbContext
+            ) =>
             {
                 var existingInvoice = await dbContext.Invoices.FindAsync(id);
 
@@ -64,7 +78,13 @@ public static class InvoicesEndpoints
                     return Results.NotFound();
                 }
 
-                dbContext.Entry(existingInvoice).CurrentValues.SetValues(updatedInvoice);
+                var customer =
+                    await dbContext.Customers.FindAsync(customerId)
+                    ?? throw new ArgumentException("Customer not found.");
+
+                dbContext
+                    .Entry(existingInvoice)
+                    .CurrentValues.SetValues(updatedInvoice.ToEntity(id, customer));
                 await dbContext.SaveChangesAsync();
 
                 return Results.NoContent();
