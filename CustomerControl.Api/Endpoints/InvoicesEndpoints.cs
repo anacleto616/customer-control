@@ -1,5 +1,6 @@
 using CustomerControl.Api.Data;
 using CustomerControl.Api.Entities;
+using CustomerControl.Api.Mapping;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerControl.Api.Endpoints;
@@ -16,7 +17,10 @@ public static class InvoicesEndpoints
         group.MapGet(
             "/",
             async (CustomerControlContext dbContext) =>
-                await dbContext.Invoices.Select(invoices => invoices).AsNoTracking().ToListAsync()
+                await dbContext
+                    .Invoices.Select(invoice => invoice.ToInvoiceSummaryDto())
+                    .AsNoTracking()
+                    .ToListAsync()
         );
 
         // GET /invoices/1

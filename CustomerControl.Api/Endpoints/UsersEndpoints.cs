@@ -22,7 +22,9 @@ public static class UsersEndpoints
                 CustomerControlContext dbContext
             ) =>
             {
-                var existingUser = await dbContext.Users.AnyAsync(u => u.Email == newUser.Email);
+                var existingUser = await dbContext.Users.AnyAsync(user =>
+                    user.Email == newUser.Email
+                );
 
                 if (existingUser)
                 {
