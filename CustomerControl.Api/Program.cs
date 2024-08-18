@@ -20,7 +20,16 @@ builder.Services.AddDbContext<CustomerControlContext>(options =>
 
 builder.Services.AddSingleton<Argon2PasswordHasher>();
 
+builder.Services.AddCors(options =>
+    options.AddPolicy(
+        "AllowLocalhost4200",
+        builder => builder.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod()
+    )
+);
+
 var app = builder.Build();
+
+app.UseCors("AllowLocalhost4200");
 
 app.MapUsersEndpoints();
 app.MapCustomersEndpoints();
