@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using CustomerControl.Api.Data;
 using CustomerControl.Api.Endpoints;
 using CustomerControl.Api.Services;
@@ -16,6 +17,10 @@ var connectionString =
 
 builder.Services.AddDbContext<CustomerControlContext>(options =>
     options.UseNpgsql(connectionString)
+);
+
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
 );
 
 builder.Services.AddSingleton<Argon2PasswordHasher>();

@@ -19,7 +19,8 @@ namespace CustomerControl.Api.Endpoints
                 "/",
                 async (CustomerControlContext dbContext) =>
                     await dbContext
-                        .Customers.Select(customer => customer.ToCustomerDetailsDto())
+                        .Customers.Include(customer => customer.Invoices)
+                        .Select(customer => customer.ToCustomerDetailsDto())
                         .AsNoTracking()
                         .ToListAsync()
             );
