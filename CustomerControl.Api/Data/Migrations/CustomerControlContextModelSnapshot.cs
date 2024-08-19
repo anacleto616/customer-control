@@ -113,7 +113,7 @@ namespace CustomerControl.Api.Data.Migrations
                             Amount = 100.00m,
                             CustomerId = 1,
                             Description = "Invoice 1",
-                            DueDate = new DateTime(2024, 9, 16, 17, 27, 41, 917, DateTimeKind.Utc).AddTicks(9158),
+                            DueDate = new DateTime(2024, 9, 19, 0, 5, 2, 575, DateTimeKind.Utc).AddTicks(9947),
                             Paid = false
                         },
                         new
@@ -122,7 +122,7 @@ namespace CustomerControl.Api.Data.Migrations
                             Amount = 200.00m,
                             CustomerId = 2,
                             Description = "Invoice 2",
-                            DueDate = new DateTime(2024, 9, 16, 17, 27, 41, 917, DateTimeKind.Utc).AddTicks(9264),
+                            DueDate = new DateTime(2024, 10, 4, 0, 5, 2, 576, DateTimeKind.Utc).AddTicks(37),
                             Paid = true
                         });
                 });
@@ -157,14 +157,14 @@ namespace CustomerControl.Api.Data.Migrations
                             Id = 1,
                             Email = "alice@example.com",
                             Name = "Alice",
-                            Password = "+TDCQANLq7qeMUjxCg0QvJrX0qnY0WbD2Lbv7EJF3bCYMg1sQbN3RHZr7RRhkipN"
+                            Password = "$2a$09$qVxEJ4tOllLhpSekobkHTebEGiDt7MB/VzW96zv6TEA2ezk2nodnC"
                         },
                         new
                         {
                             Id = 2,
                             Email = "bob@example.com",
                             Name = "Bob",
-                            Password = "dImTgkU5lr/RFZRW9N5ysfu0k6wLjx+ib7epmwwNUX3FHi9IjdyUvzFqEx4d0nHb"
+                            Password = "$2a$09$Ni7R9hlbomNnDIGAscdm2ujXGUuNYxHjV9rqGHWC15d8aad.1R43m"
                         });
                 });
 

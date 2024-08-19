@@ -13,8 +13,6 @@ public class CustomerControlContext(DbContextOptions<CustomerControlContext> opt
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var hasher = new Argon2PasswordHasher();
-
         modelBuilder
             .Entity<User>()
             .HasMany(u => u.Customers)
@@ -35,14 +33,14 @@ public class CustomerControlContext(DbContextOptions<CustomerControlContext> opt
                     Id = 1,
                     Name = "Alice",
                     Email = "alice@example.com",
-                    Password = hasher.HashPassword("Alice@2024")
+                    Password = BCryptService.HashPassword("Alice@2024")
                 },
                 new
                 {
                     Id = 2,
                     Name = "Bob",
                     Email = "bob@example.com",
-                    Password = hasher.HashPassword("Bob@2024")
+                    Password = BCryptService.HashPassword("Bob@2024")
                 }
             );
 

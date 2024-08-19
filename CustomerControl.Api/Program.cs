@@ -1,8 +1,11 @@
+using System.Text;
 using System.Text.Json.Serialization;
 using CustomerControl.Api.Data;
 using CustomerControl.Api.Endpoints;
 using CustomerControl.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,11 +22,33 @@ builder.Services.AddDbContext<CustomerControlContext>(options =>
     options.UseNpgsql(connectionString)
 );
 
+builder
+    .Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(AppSettingsService.JwtSettings.Key)
+            ),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
 );
-
-builder.Services.AddSingleton<Argon2PasswordHasher>();
 
 builder.Services.AddCors(options =>
     options.AddPolicy(
@@ -35,6 +60,9 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors("AllowLocalhost4200");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapUsersEndpoints();
 app.MapCustomersEndpoints();

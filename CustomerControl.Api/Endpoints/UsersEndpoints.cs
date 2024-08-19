@@ -3,6 +3,7 @@ using CustomerControl.Api.Dtos;
 using CustomerControl.Api.Entities;
 using CustomerControl.Api.Mapping;
 using CustomerControl.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerControl.Api.Endpoints;
@@ -16,11 +17,8 @@ public static class UsersEndpoints
         // POST /users/register
         group.MapPost(
             "/register",
-            async (
-                UserRegisterDto newUser,
-                Argon2PasswordHasher hasher,
-                CustomerControlContext dbContext
-            ) =>
+            [AllowAnonymous]
+            async (UserRegisterDto newUser, CustomerControlContext dbContext) =>
             {
                 var existingUser = await dbContext.Users.AnyAsync(user =>
                     user.Email == newUser.Email
@@ -35,12 +33,38 @@ public static class UsersEndpoints
 
                 User user = newUser.ToEntity();
 
-                user.Password = hasher.HashPassword(user.Password);
+                user.Password = BCryptService.HashPassword(user.Password);
 
                 dbContext.Users.Add(user);
                 await dbContext.SaveChangesAsync();
 
                 return Results.Ok("Usuário criado com sucesso.");
+            }
+        );
+
+        // POST /users/login
+        group.MapPost(
+            "/login",
+            [AllowAnonymous]
+            async (UserLoginDto userLogin, CustomerControlContext dbContext) =>
+            {
+                var user = await dbContext
+                    .Users.Where(user => user.Email == userLogin.Email)
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var passwordMatches = BCryptService.VerifyPassword(
+                    userLogin.Password,
+                    user.Password
+                );
+
+                return !passwordMatches
+                    ? Results.Unauthorized()
+                    : Results.Ok(JwtBearerService.GenerateToken(user));
             }
         );
 

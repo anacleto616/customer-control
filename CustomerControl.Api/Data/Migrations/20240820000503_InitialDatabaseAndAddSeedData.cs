@@ -4,10 +4,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace CustomerControl.Api.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialDatabase : Migration
+    public partial class InitialDatabaseAndAddSeedData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,6 +73,33 @@ namespace CustomerControl.Api.Data.Migrations
                         principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Email", "Name", "Password" },
+                values: new object[,]
+                {
+                    { 1, "alice@example.com", "Alice", "$2a$09$qVxEJ4tOllLhpSekobkHTebEGiDt7MB/VzW96zv6TEA2ezk2nodnC" },
+                    { 2, "bob@example.com", "Bob", "$2a$09$Ni7R9hlbomNnDIGAscdm2ujXGUuNYxHjV9rqGHWC15d8aad.1R43m" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Customers",
+                columns: new[] { "Id", "Address", "Document", "Name", "Phone", "UserId" },
+                values: new object[,]
+                {
+                    { 1, "Rua Nova", "12345678901", "Customer 1", "5551234567", 1 },
+                    { 2, "Rua Alta", "98765432100", "Customer 2", "5559876543", 2 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Invoices",
+                columns: new[] { "Id", "Amount", "CustomerId", "Description", "DueDate", "Paid" },
+                values: new object[,]
+                {
+                    { 1, 100.00m, 1, "Invoice 1", new DateTime(2024, 9, 19, 0, 5, 2, 575, DateTimeKind.Utc).AddTicks(9947), false },
+                    { 2, 200.00m, 2, "Invoice 2", new DateTime(2024, 10, 4, 0, 5, 2, 576, DateTimeKind.Utc).AddTicks(37), true }
                 });
 
             migrationBuilder.CreateIndex(
