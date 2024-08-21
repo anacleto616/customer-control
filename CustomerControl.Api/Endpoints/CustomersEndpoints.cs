@@ -64,7 +64,6 @@ namespace CustomerControl.Api.Endpoints
                 "/{id}",
                 async (
                     int id,
-                    int userId,
                     UpdateCustomerDto updatedCustomer,
                     CustomerControlContext dbContext
                 ) =>
@@ -75,10 +74,6 @@ namespace CustomerControl.Api.Endpoints
                     {
                         return Results.NotFound();
                     }
-
-                    var user =
-                        await dbContext.Users.FindAsync(userId)
-                        ?? throw new ArgumentException("User not found.");
 
                     dbContext
                         .Entry(existingCustomer)

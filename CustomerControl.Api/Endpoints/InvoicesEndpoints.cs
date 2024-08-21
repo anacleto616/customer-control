@@ -16,10 +16,11 @@ public static class InvoicesEndpoints
 
         // GET /invoices
         group.MapGet(
-            "/",
-            async (CustomerControlContext dbContext) =>
+            "/all/{customerId}",
+            async (int customerId, CustomerControlContext dbContext) =>
                 await dbContext
-                    .Invoices.Select(invoice => invoice.ToInvoiceDetailsDto())
+                    .Invoices.Where(invoice => invoice.Id == customerId)
+                    .Select(invoice => invoice.ToInvoiceDetailsDto())
                     .AsNoTracking()
                     .ToListAsync()
         );
@@ -42,12 +43,8 @@ public static class InvoicesEndpoints
         // POST /invoices
         group.MapPost(
             "/",
-            async (CreateInvoiceDto newInvoice, int customerId, CustomerControlContext dbContext) =>
+            async (CreateInvoiceDto newInvoice, CustomerControlContext dbContext) =>
             {
-                var customer =
-                    await dbContext.Customers.FindAsync(customerId)
-                    ?? throw new ArgumentException("Customer not found.");
-
                 Invoice invoice = newInvoice.ToEntity();
 
                 dbContext.Invoices.Add(invoice);
@@ -64,12 +61,7 @@ public static class InvoicesEndpoints
         // PUT /invoices/1
         group.MapPut(
             "/{id}",
-            async (
-                int id,
-                int customerId,
-                UpdateInvoiceDto updatedInvoice,
-                CustomerControlContext dbContext
-            ) =>
+            async (int id, UpdateInvoiceDto updatedInvoice, CustomerControlContext dbContext) =>
             {
                 var existingInvoice = await dbContext.Invoices.FindAsync(id);
 
@@ -77,10 +69,6 @@ public static class InvoicesEndpoints
                 {
                     return Results.NotFound();
                 }
-
-                var customer =
-                    await dbContext.Customers.FindAsync(customerId)
-                    ?? throw new ArgumentException("Customer not found.");
 
                 dbContext
                     .Entry(existingInvoice)
