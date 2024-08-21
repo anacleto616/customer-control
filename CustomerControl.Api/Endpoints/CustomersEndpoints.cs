@@ -16,10 +16,11 @@ namespace CustomerControl.Api.Endpoints
 
             // GET /customers
             group.MapGet(
-                "/",
-                async (CustomerControlContext dbContext) =>
+                "/all/{userId}",
+                async (int userId, CustomerControlContext dbContext) =>
                     await dbContext
-                        .Customers.Include(customer => customer.Invoices)
+                        .Customers.Where(customer => customer.UserId == userId)
+                        .Include(customer => customer.Invoices)
                         .Select(customer => customer.ToCustomerDetailsDto())
                         .AsNoTracking()
                         .ToListAsync()
@@ -43,16 +44,8 @@ namespace CustomerControl.Api.Endpoints
             // POST /customers
             group.MapPost(
                 "/",
-                async (
-                    CreateCustomerDto newCustomer,
-                    int userId,
-                    CustomerControlContext dbContext
-                ) =>
+                async (CreateCustomerDto newCustomer, CustomerControlContext dbContext) =>
                 {
-                    var user =
-                        await dbContext.Users.FindAsync(userId)
-                        ?? throw new ArgumentException("User not found.");
-
                     Customer customer = newCustomer.ToEntity();
 
                     dbContext.Customers.Add(customer);

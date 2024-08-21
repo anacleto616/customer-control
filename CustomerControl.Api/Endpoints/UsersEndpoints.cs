@@ -62,9 +62,11 @@ public static class UsersEndpoints
                     user.Password
                 );
 
-                return !passwordMatches
-                    ? Results.Unauthorized()
-                    : Results.Ok(JwtBearerService.GenerateToken(user));
+                var token = JwtBearerService.GenerateToken(user);
+
+                var response = new LoginResponseDto(token, user.Id);
+
+                return !passwordMatches ? Results.Unauthorized() : Results.Ok(response);
             }
         );
 
