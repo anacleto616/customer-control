@@ -23,7 +23,7 @@ public static class InvoicesEndpoints
                     .Select(invoice => invoice.ToInvoiceDetailsDto())
                     .AsNoTracking()
                     .ToListAsync()
-        );
+        ).RequireAuthorization();
 
         // GET /invoices/1
         group
@@ -37,7 +37,7 @@ public static class InvoicesEndpoints
                         ? Results.NotFound()
                         : Results.Ok(invoice.ToInvoiceSummaryDto());
                 }
-            )
+            ).RequireAuthorization();
             .WithName(GetInvoiceEndpointName);
 
         // POST /invoices
@@ -56,7 +56,7 @@ public static class InvoicesEndpoints
                     invoice.ToInvoiceSummaryDto()
                 );
             }
-        );
+        ).RequireAuthorization();
 
         // PUT /invoices/1
         group.MapPut(
@@ -77,7 +77,7 @@ public static class InvoicesEndpoints
 
                 return Results.NoContent();
             }
-        );
+        ).RequireAuthorization();
 
         // DELETE /invoice/1
         group.MapDelete(
@@ -88,7 +88,7 @@ public static class InvoicesEndpoints
 
                 return Results.NoContent();
             }
-        );
+        ).RequireAuthorization();
 
         return group;
     }

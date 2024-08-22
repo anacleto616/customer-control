@@ -15,7 +15,7 @@ namespace CustomerControl.Api.Endpoints
             var group = app.MapGroup("customers").WithParameterValidation();
 
             // GET /customers
-            group.MapGet(
+            global::System.Object value = group.MapGet(
                 "/all/{userId}",
                 async (int userId, CustomerControlContext dbContext) =>
                     await dbContext
@@ -24,7 +24,7 @@ namespace CustomerControl.Api.Endpoints
                         .Select(customer => customer.ToCustomerDetailsDto())
                         .AsNoTracking()
                         .ToListAsync()
-            );
+            ).RequireAuthorization();
 
             // GET /customers/1
             group
@@ -39,7 +39,8 @@ namespace CustomerControl.Api.Endpoints
                             : Results.Ok(customer.ToCustomerSummaryDto());
                     }
                 )
-                .WithName(GetCustomerEndpointName);
+                .WithName(GetCustomerEndpointName)
+                .RequireAuthorization();
 
             // POST /customers
             group.MapPost(
@@ -57,7 +58,7 @@ namespace CustomerControl.Api.Endpoints
                         customer.ToCustomerSummaryDto()
                     );
                 }
-            );
+            ).RequireAuthorization();
 
             // PUT /customers/1
             group.MapPut(
@@ -83,7 +84,7 @@ namespace CustomerControl.Api.Endpoints
 
                     return Results.NoContent();
                 }
-            );
+            ).RequireAuthorization();
 
             // DELETE /customers/1
             group.MapDelete(
@@ -96,7 +97,7 @@ namespace CustomerControl.Api.Endpoints
 
                     return Results.NoContent();
                 }
-            );
+            ).RequireAuthorization();z;
 
             return group;
         }
