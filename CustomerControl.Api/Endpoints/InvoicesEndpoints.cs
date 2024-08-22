@@ -15,15 +15,17 @@ public static class InvoicesEndpoints
         var group = app.MapGroup("invoices").WithParameterValidation();
 
         // GET /invoices
-        group.MapGet(
-            "/all/{customerId}",
-            async (int customerId, CustomerControlContext dbContext) =>
-                await dbContext
-                    .Invoices.Where(invoice => invoice.Id == customerId)
-                    .Select(invoice => invoice.ToInvoiceDetailsDto())
-                    .AsNoTracking()
-                    .ToListAsync()
-        ).RequireAuthorization();
+        group
+            .MapGet(
+                "/all/{customerId}",
+                async (int customerId, CustomerControlContext dbContext) =>
+                    await dbContext
+                        .Invoices.Where(invoice => invoice.Id == customerId)
+                        .Select(invoice => invoice.ToInvoiceDetailsDto())
+                        .AsNoTracking()
+                        .ToListAsync()
+            )
+            .RequireAuthorization();
 
         // GET /invoices/1
         group
@@ -37,58 +39,67 @@ public static class InvoicesEndpoints
                         ? Results.NotFound()
                         : Results.Ok(invoice.ToInvoiceSummaryDto());
                 }
-            ).RequireAuthorization();
-            .WithName(GetInvoiceEndpointName);
+            )
+            .WithName(GetInvoiceEndpointName)
+            .RequireAuthorization();
 
         // POST /invoices
-        group.MapPost(
-            "/",
-            async (CreateInvoiceDto newInvoice, CustomerControlContext dbContext) =>
-            {
-                Invoice invoice = newInvoice.ToEntity();
+        group
+            .MapPost(
+                "/",
+                async (CreateInvoiceDto newInvoice, CustomerControlContext dbContext) =>
+                {
+                    Invoice invoice = newInvoice.ToEntity();
 
-                dbContext.Invoices.Add(invoice);
-                await dbContext.SaveChangesAsync();
+                    dbContext.Invoices.Add(invoice);
+                    await dbContext.SaveChangesAsync();
 
-                return Results.CreatedAtRoute(
-                    GetInvoiceEndpointName,
-                    new { id = invoice.Id },
-                    invoice.ToInvoiceSummaryDto()
-                );
-            }
-        ).RequireAuthorization();
+                    return Results.CreatedAtRoute(
+                        GetInvoiceEndpointName,
+                        new { id = invoice.Id },
+                        invoice.ToInvoiceSummaryDto()
+                    );
+                }
+            )
+            .RequireAuthorization();
 
         // PUT /invoices/1
-        group.MapPut(
-            "/{id}",
-            async (int id, UpdateInvoiceDto updatedInvoice, CustomerControlContext dbContext) =>
-            {
-                var existingInvoice = await dbContext.Invoices.FindAsync(id);
-
-                if (existingInvoice is null)
+        group
+            .MapPut(
+                "/{id}",
+                async (int id, UpdateInvoiceDto updatedInvoice, CustomerControlContext dbContext) =>
                 {
-                    return Results.NotFound();
+                    var existingInvoice = await dbContext.Invoices.FindAsync(id);
+
+                    if (existingInvoice is null)
+                    {
+                        return Results.NotFound();
+                    }
+
+                    dbContext
+                        .Entry(existingInvoice)
+                        .CurrentValues.SetValues(updatedInvoice.ToEntity(id));
+                    await dbContext.SaveChangesAsync();
+
+                    return Results.NoContent();
                 }
-
-                dbContext
-                    .Entry(existingInvoice)
-                    .CurrentValues.SetValues(updatedInvoice.ToEntity(id));
-                await dbContext.SaveChangesAsync();
-
-                return Results.NoContent();
-            }
-        ).RequireAuthorization();
+            )
+            .RequireAuthorization();
 
         // DELETE /invoice/1
-        group.MapDelete(
-            "/{id}",
-            async (int id, CustomerControlContext dbContext) =>
-            {
-                await dbContext.Invoices.Where(invoice => invoice.Id == id).ExecuteDeleteAsync();
+        group
+            .MapDelete(
+                "/{id}",
+                async (int id, CustomerControlContext dbContext) =>
+                {
+                    await dbContext
+                        .Invoices.Where(invoice => invoice.Id == id)
+                        .ExecuteDeleteAsync();
 
-                return Results.NoContent();
-            }
-        ).RequireAuthorization();
+                    return Results.NoContent();
+                }
+            )
+            .RequireAuthorization();
 
         return group;
     }

@@ -15,16 +15,18 @@ namespace CustomerControl.Api.Endpoints
             var group = app.MapGroup("customers").WithParameterValidation();
 
             // GET /customers
-            global::System.Object value = group.MapGet(
-                "/all/{userId}",
-                async (int userId, CustomerControlContext dbContext) =>
-                    await dbContext
-                        .Customers.Where(customer => customer.UserId == userId)
-                        .Include(customer => customer.Invoices)
-                        .Select(customer => customer.ToCustomerDetailsDto())
-                        .AsNoTracking()
-                        .ToListAsync()
-            ).RequireAuthorization();
+            global::System.Object value = group
+                .MapGet(
+                    "/all/{userId}",
+                    async (int userId, CustomerControlContext dbContext) =>
+                        await dbContext
+                            .Customers.Where(customer => customer.UserId == userId)
+                            .Include(customer => customer.Invoices)
+                            .Select(customer => customer.ToCustomerDetailsDto())
+                            .AsNoTracking()
+                            .ToListAsync()
+                )
+                .RequireAuthorization();
 
             // GET /customers/1
             group
@@ -43,61 +45,67 @@ namespace CustomerControl.Api.Endpoints
                 .RequireAuthorization();
 
             // POST /customers
-            group.MapPost(
-                "/",
-                async (CreateCustomerDto newCustomer, CustomerControlContext dbContext) =>
-                {
-                    Customer customer = newCustomer.ToEntity();
+            group
+                .MapPost(
+                    "/",
+                    async (CreateCustomerDto newCustomer, CustomerControlContext dbContext) =>
+                    {
+                        Customer customer = newCustomer.ToEntity();
 
-                    dbContext.Customers.Add(customer);
-                    await dbContext.SaveChangesAsync();
+                        dbContext.Customers.Add(customer);
+                        await dbContext.SaveChangesAsync();
 
-                    return Results.CreatedAtRoute(
-                        GetCustomerEndpointName,
-                        new { id = customer.Id },
-                        customer.ToCustomerSummaryDto()
-                    );
-                }
-            ).RequireAuthorization();
+                        return Results.CreatedAtRoute(
+                            GetCustomerEndpointName,
+                            new { id = customer.Id },
+                            customer.ToCustomerSummaryDto()
+                        );
+                    }
+                )
+                .RequireAuthorization();
 
             // PUT /customers/1
-            group.MapPut(
-                "/{id}",
-                async (
-                    int id,
-                    UpdateCustomerDto updatedCustomer,
-                    CustomerControlContext dbContext
-                ) =>
-                {
-                    var existingCustomer = await dbContext.Customers.FindAsync(id);
-
-                    if (existingCustomer is null)
+            group
+                .MapPut(
+                    "/{id}",
+                    async (
+                        int id,
+                        UpdateCustomerDto updatedCustomer,
+                        CustomerControlContext dbContext
+                    ) =>
                     {
-                        return Results.NotFound();
+                        var existingCustomer = await dbContext.Customers.FindAsync(id);
+
+                        if (existingCustomer is null)
+                        {
+                            return Results.NotFound();
+                        }
+
+                        dbContext
+                            .Entry(existingCustomer)
+                            .CurrentValues.SetValues(updatedCustomer.ToEntity(id));
+
+                        await dbContext.SaveChangesAsync();
+
+                        return Results.NoContent();
                     }
-
-                    dbContext
-                        .Entry(existingCustomer)
-                        .CurrentValues.SetValues(updatedCustomer.ToEntity(id));
-
-                    await dbContext.SaveChangesAsync();
-
-                    return Results.NoContent();
-                }
-            ).RequireAuthorization();
+                )
+                .RequireAuthorization();
 
             // DELETE /customers/1
-            group.MapDelete(
-                "/{id}",
-                async (int id, CustomerControlContext dbContext) =>
-                {
-                    await dbContext
-                        .Customers.Where(customer => customer.Id == id)
-                        .ExecuteDeleteAsync();
+            group
+                .MapDelete(
+                    "/{id}",
+                    async (int id, CustomerControlContext dbContext) =>
+                    {
+                        await dbContext
+                            .Customers.Where(customer => customer.Id == id)
+                            .ExecuteDeleteAsync();
 
-                    return Results.NoContent();
-                }
-            ).RequireAuthorization();z;
+                        return Results.NoContent();
+                    }
+                )
+                .RequireAuthorization();
 
             return group;
         }
